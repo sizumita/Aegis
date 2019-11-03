@@ -29,3 +29,5 @@ class Aegis(commands.Bot):
         await super().logout()
         with open('prefixes.json', 'w', encoding='utf-8') as f:
             json.dump(self.prefixes, f, indent=4)
+
+
