@@ -1,0 +1,6 @@
+.env
+*.json
+*.pyc
+*.pyi
+*.pyx
+.idea/*
