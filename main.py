@@ -2,12 +2,21 @@ from bot import Aegis
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
+import discord
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-cogs = [f"cogs.{path[:-3]}" for path in os.listdir('./cogs')]
-
 aegis = Aegis()
+
+cogs = [f"cogs.{path[:-3]}" for path in os.listdir('./cogs') if path.endswith('.py')]
+
+for cog in cogs:
+    aegis.load_extension(cog)
+
+
+@aegis.command()
+async def test(ctx):
+    await ctx.send('test')
 
 
 async def setup():
