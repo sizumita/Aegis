@@ -3,7 +3,8 @@ import itertools
 
 import discord
 from discord.ext import commands
-from .database import CommandPermission
+from .context import FakeContext
+from .checks import check_command_permission
 from .paginator import Pages
 
 
@@ -13,6 +14,7 @@ class HelpPaginator(Pages):
 
     def __init__(self, help_command, ctx, entries, *, per_page=4):
         super().__init__(ctx, entries=entries, per_page=per_page)
+        self.ctx = ctx
         self.reaction_emojis.append(('\N{WHITE QUESTION MARK ORNAMENT}', self.show_bot_help))
         self.total = len(entries)
         self.help_command = help_command
@@ -25,25 +27,31 @@ class HelpPaginator(Pages):
         self.description = description
         return commands
 
-    def prepare_embed(self, entries, page, *, first=False):
+    async def prepare_embed(self, entries, page, *, first=False):
         self.embed.clear_fields()
         self.embed.description = self.description
         self.embed.title = self.title
 
         if self.is_bot:
-            value = f'さらにヘルプが必要であれば、 @すみどら#8923 まで。'
+            value = (f'**コマンド名に打ち消し線が引かれているコマンドは実行できません!**\n実行したい場合は管理人に有効化を求めてください。\n'
+                     f'さらにヘルプが必要であれば、 @すみどら#8923 まで。')
             self.embed.add_field(name='Support', value=value, inline=False)
 
         self.embed.set_footer(text=f'コマンドの詳細は"{self.prefix}help コマンド名" を使用してください。')
 
         for entry in entries:
-            signature = f'{entry.qualified_name} {entry.signature}'
+            if await check_command_permission(FakeContext(entry.cog, entry, self.author, self.ctx.guild,
+                                                          self.permissions, self.channel)):
+                signature = f'{entry.qualified_name} {entry.signature}'
+            else:
+                signature = f'~~{entry.qualified_name} {entry.signature}~~'
+
             if entry.short_doc:
                 doc = entry.short_doc
                 if isinstance(entry, commands.Group):
                     doc += f'\n詳しい詳細は`{self.prefix}help {entry.qualified_name}`で確認してください。'
             else:
-                doc = "ヘルプはありません。"
+                doc = "説明はありません。"
 
             self.embed.add_field(name=signature, value=doc, inline=False)
 

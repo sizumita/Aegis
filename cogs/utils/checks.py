@@ -1,9 +1,7 @@
 from .database import CommandPermission
-import discord
-from discord.ext import commands
 
 
-async def check_command_permission(context: commands.Context):
+async def check_command_permission(context):
     """
     権限周りについて:
         DMの場合確実に有効
@@ -23,7 +21,7 @@ async def check_command_permission(context: commands.Context):
         return True
 
     elif context.cog:
-        if context.cog.qualified_name == 'ManageCog':
+        if context.cog.qualified_name == 'Manage':
             return True
 
     p: CommandPermission = await CommandPermission.query.where(CommandPermission.id == context.guild.id) \
@@ -46,12 +44,5 @@ async def check_command_permission(context: commands.Context):
 
     if p.users:
         checks.append(True if str(context.author.id) in p.users else False)
-
-    if p.permissions:
-        has_permission = any([True for value in p.permissions.split(',')
-                              if discord.Permissions(int(value)).is_subset(context.author.guild_permissions)
-                              ])
-
-        checks.append(has_permission)
 
     return any(checks)

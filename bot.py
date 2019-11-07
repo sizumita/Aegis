@@ -46,3 +46,15 @@ class Aegis(commands.Bot):
 
         if await check_command_permission(context):
             await self.invoke(context)
+
+    @staticmethod
+    def get_command_full_name(command: commands.Command):
+        name = f'{command.cog_name}.'
+        _command = command.parent
+        while _command:
+            name += f'{_command.qualified_name}.'
+            _command = _command.parent
+
+        name += command.qualified_name
+
+        return name

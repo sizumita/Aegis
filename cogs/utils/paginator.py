@@ -84,11 +84,11 @@ class Pages:
     def get_content(self, entries, page, *, first=False):
         return None
 
-    def get_embed(self, entries, page, *, first=False):
-        self.prepare_embed(entries, page, first=first)
+    async def get_embed(self, entries, page, *, first=False):
+        await self.prepare_embed(entries, page, first=first)
         return self.embed
 
-    def prepare_embed(self, entries, page, *, first=False):
+    async def prepare_embed(self, entries, page, *, first=False):
         p = []
         for index, entry in enumerate(entries, 1 + ((page - 1) * self.per_page)):
             p.append(f'{index}. {entry}')
@@ -111,7 +111,7 @@ class Pages:
         self.current_page = page
         entries = self.get_page(page)
         content = self.get_content(entries, page, first=first)
-        embed = self.get_embed(entries, page, first=first)
+        embed = await self.get_embed(entries, page, first=first)
 
         if not self.paginating:
             return await self.channel.send(content=content, embed=embed)
