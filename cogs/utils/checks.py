@@ -25,14 +25,14 @@ async def check_command_permission(context):
             return True
 
     p: CommandPermission = await CommandPermission.query.where(CommandPermission.id == context.guild.id) \
-        .where(CommandPermission.name == context.command.name).gino.first()
+        .where(CommandPermission.name == context.bot.get_command_full_name(context.command)).gino.first()
 
     #  ない場合
     if not p:
         return False
 
     #  制限なしの場合
-    if not p.roles and not p.users and not p.permissions:
+    if not p.roles and not p.users:
         return True
 
     checks = []

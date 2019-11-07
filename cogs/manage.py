@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog, Context, Bot, check
 from .utils.checks import check_command_permission
 from .utils.context import FakeContext
-from .utils.database import is_exist, create, get, add_role, add_user, delete
+from .utils.database import is_exist, create, get, add_role, add_user, delete, CommandPermission
 from bot import Aegis
 import discord
 
@@ -24,6 +24,12 @@ def admin_only():
         return True
 
     return check(predicate)
+
+
+def can_change_permission(command):
+    if command.cog_name == "Manage" or command.qualified_name == "help":
+        return False
+    return True
 
 
 class Manage(Cog):
@@ -72,12 +78,16 @@ class Manage(Cog):
             await ctx.send('そのようなコマンドはありません.')
             return
 
+        if not can_change_permission(command):
+            await ctx.send('そのコマンドは変更できません.')
+
         name = self.bot.get_command_full_name(command)
         if await is_exist(ctx.guild.id, name):
-            await ctx.send('そのコマンドは有効化されています。')
+            await ctx.send('そのコマンドは有効化されています.')
             return
 
         await create(ctx.guild.id, name)
+        await ctx.send(f'コマンド:{command.name}を有効化しました.')
 
     @command.command(aliases=['deny'])
     @admin_only()
@@ -90,12 +100,16 @@ class Manage(Cog):
             await ctx.send('そのようなコマンドはありません.')
             return
 
+        if not can_change_permission(command):
+            await ctx.send('そのコマンドは変更できません。')
+
         name = self.bot.get_command_full_name(command)
         if not await is_exist(ctx.guild.id, name):
             await ctx.send('そのコマンドは有効化されていません。')
             return
 
         await delete(ctx.guild.id, name)
+        await ctx.send(f'コマンド:{command.name}を無効化しました.')
 
 
 def setup(bot):

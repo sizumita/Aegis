@@ -24,7 +24,7 @@ async def is_exist(_id, name):
 
 
 async def create(_id, name):
-    if is_exist(_id, name):
+    if await is_exist(_id, name):
         return await get(_id, name)
 
     return await CommandPermission.create(id=_id, name=name)
