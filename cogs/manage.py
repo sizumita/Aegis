@@ -8,14 +8,6 @@ import discord
 
 
 def admin_only():
-    """A :func:`.check` that indicates this command must only be used in a
-    guild context only. Basically, no private messages are allowed when
-    using the command.
-
-    This check raises a special exception, :exc:`.NoPrivateMessage`
-    that is inherited from :exc:`.CheckFailure`.
-    """
-
     def predicate(ctx):
         permissions: discord.Permissions = ctx.author.guild_permissions
 
@@ -36,27 +28,35 @@ class Manage(Cog):
     def __init__(self, bot: Aegis):
         self.bot = bot
 
+    def get_command(self, name):
+        names = name.split(' ')
+        try:
+            command = self.bot.get_command(names.pop(0))
+            if isinstance(command, commands.Group):
+                for name in names:
+                    command = command.get_command(name)
+        except Exception:
+            command = None
+
+        return command
+
     @commands.command()
     async def usage(self, ctx):
         """このBOTの使用方法や設定方法などを表示します。"""
 
     @commands.group(aliases=['cmd'], invoke_without_command=True)
     @commands.guild_only()
-    async def command(self, ctx: Context, *command_names):
+    async def command(self, ctx: Context, *, command_name):
         """コマンドの有効化・無効化、表示用のコマンドです。
         引数にコマンド名を入れるとコマンドの詳細を表示します。"""
-        command_names = list(command_names)
-        command = self.bot.get_command(command_names.pop(0))
-        if isinstance(command, commands.Group):
-            for name in command_names:
-                command = command.get_command(name)
+        command = self.get_command(command_name)
 
         if command is None:
             await ctx.send('そのようなコマンドはありません.')
             return
 
         can_use = await check_command_permission(
-            FakeContext(command.cog, command, ctx.author, ctx.guild, ctx.author.guild_permissions, ctx.channel))
+            FakeContext(command.cog, command, ctx.author, ctx.guild, ctx.author.guild_permissions, ctx.channel, ctx.bot))
 
         embed = discord.Embed(title='使用可能' if can_use else '使用不可能',
                               description=f"`{command.qualified_name} {command.signature}`\n{command.short_doc or ''}",
@@ -70,47 +70,91 @@ class Manage(Cog):
 
     @command.command(aliases=['allow'])
     @admin_only()
-    async def enable(self, ctx: Context, command_name: str):
-        """コマンドを有効化します。"""
-        command = self.bot.get_command(command_name)
+    async def enable(self, ctx: Context, *, command_name):
+        """コマンドを有効化します。大文字から始めるとCogの名前とみなされ、そのCogのコマンドが全て有効化されます。（例: `cmd allow Math`）"""
+        if not command_name[0].isupper():
+            command = self.bot.get_command(command_name)
 
-        if command is None:
-            await ctx.send('そのようなコマンドはありません.')
-            return
+            if command is None:
+                await ctx.send('そのようなコマンドはありません.')
+                return
 
-        if not can_change_permission(command):
-            await ctx.send('そのコマンドは変更できません.')
+            if not can_change_permission(command):
+                await ctx.send('そのコマンドは変更できません.')
 
-        name = self.bot.get_command_full_name(command)
-        if await is_exist(ctx.guild.id, name):
-            await ctx.send('そのコマンドは有効化されています.')
-            return
+            name = self.bot.get_command_full_name(command)
+            if await is_exist(ctx.guild.id, name):
+                await ctx.send('そのコマンドは有効化されています.')
+                return
 
-        await create(ctx.guild.id, name)
-        await ctx.send(f'コマンド:{command.name}を有効化しました.')
+            await create(ctx.guild.id, name)
+            await ctx.send(f'コマンド:{command.name}を有効化しました.')
+        else:
+            cog = self.bot.get_cog(command_name)
+
+            if cog is None:
+                await ctx.send('そのようなCogはありません。')
+                return
+            changed_commands = []
+
+            for command in cog.get_commands():
+                if not can_change_permission(command):
+                    continue
+
+                name = self.bot.get_command_full_name(command)
+                if await is_exist(ctx.guild.id, name):
+                    continue
+
+                await create(ctx.guild.id, name)
+                changed_commands.append(command)
+
+            await ctx.send('コマンド:' + ','.join([f'`{_.qualified_name}`' for _ in changed_commands]) + 'を有効化しました。')
 
     @command.command(aliases=['deny'])
     @admin_only()
-    async def disable(self, ctx: Context, command_name: str):
-        """コマンドを無効化します。設定した権限は初期化されます。"""
+    async def disable(self, ctx: Context, command_name):
+        """コマンドを無効化します。設定した権限は初期化されます。
+        大文字から始めるとCogの名前とみなされ、そのCogのコマンドが全て無効化されます（例: `cmd deny Math`）。"""
 
-        command = self.bot.get_command(command_name)
+        if not command_name[0].isupper():
 
-        if command is None:
-            await ctx.send('そのようなコマンドはありません.')
-            return
+            command = self.bot.get_command(command_name)
 
-        if not can_change_permission(command):
-            await ctx.send('そのコマンドは変更できません。')
+            if command is None:
+                await ctx.send('そのようなコマンドはありません.')
+                return
 
-        name = self.bot.get_command_full_name(command)
-        if not await is_exist(ctx.guild.id, name):
-            await ctx.send('そのコマンドは有効化されていません。')
-            return
+            if not can_change_permission(command):
+                await ctx.send('そのコマンドは変更できません。')
 
-        await delete(ctx.guild.id, name)
-        await ctx.send(f'コマンド:{command.name}を無効化しました.')
+            name = self.bot.get_command_full_name(command)
+            if not await is_exist(ctx.guild.id, name):
+                await ctx.send('そのコマンドは有効化されていません。')
+                return
 
+            await delete(ctx.guild.id, name)
+            await ctx.send(f'コマンド:{command.name}を無効化しました.')
+
+        else:
+            cog = self.bot.get_cog(command_name)
+
+            if cog is None:
+                await ctx.send('そのようなCogはありません。')
+                return
+            changed_commands = []
+
+            for command in cog.get_commands():
+                if not can_change_permission(command):
+                    continue
+
+                name = self.bot.get_command_full_name(command)
+                if not await is_exist(ctx.guild.id, name):
+                    continue
+
+                await delete(ctx.guild.id, name)
+                changed_commands.append(command)
+
+            await ctx.send('コマンド:' + ','.join([f'`{_.qualified_name}`' for _ in changed_commands]) + 'を無効化しました。')
 
 def setup(bot):
     return bot.add_cog(Manage(bot))

@@ -14,11 +14,6 @@ for cog in cogs:
     aegis.load_extension(cog)
 
 
-@aegis.command()
-async def ping(ctx):
-    await ctx.send('pong!')
-
-
 async def setup():
     await aegis.db.set_bind(os.environ.get('DATABASE'))
     await aegis.db.gino.create_all()

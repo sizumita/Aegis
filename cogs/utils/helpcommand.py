@@ -41,7 +41,7 @@ class HelpPaginator(Pages):
 
         for entry in entries:
             if await check_command_permission(FakeContext(entry.cog, entry, self.author, self.ctx.guild,
-                                                          self.permissions, self.channel)):
+                                                          self.permissions, self.channel, self.ctx.bot)):
                 signature = f'{entry.qualified_name} {entry.signature}'
             else:
                 signature = f'~~{entry.qualified_name} {entry.signature}~~'
@@ -53,7 +53,7 @@ class HelpPaginator(Pages):
             else:
                 doc = "説明はありません。"
 
-            self.embed.add_field(name=signature, value=doc, inline=False)
+            self.embed.add_field(name=f'**{signature}**', value=doc, inline=False)
 
         if self.maximum_pages:
             self.embed.set_author(name=f'ページ {page}/{self.maximum_pages} ({self.total} commands)')
