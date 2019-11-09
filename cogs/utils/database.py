@@ -51,6 +51,18 @@ async def add_role(_id, name, role_id):
     return True
 
 
+async def delete_role(_id, name, role_id):
+    permission = await get(_id, name)
+    if not permission:
+        return None
+
+    if not str(role_id) in permission.roles:
+        return False
+
+    await permission.update(roles=permission.roles.replace(f'{role_id},', '')).apply()
+    return True
+
+
 async def add_user(_id, name, user_id):
     permission = await get(_id, name)
     if not permission:
@@ -60,4 +72,17 @@ async def add_user(_id, name, user_id):
         return False
 
     await permission.update(roles=permission.users + f"{user_id},").apply()
+    return True
+
+
+async def delete_user(_id, name, user_id):
+    permission = await get(_id, name)
+
+    if not permission:
+        return None
+
+    if not str(user_id) in permission.users:
+        return False
+
+    await permission.update(roles=permission.roles.replace(f'{user_id},', '')).apply()
     return True
