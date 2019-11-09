@@ -16,9 +16,6 @@ async def check_command_permission(context):
     if not context.guild:
         return True
 
-    if context.guild.guild_permission.administrator:
-        return True
-
     #  manage系、ヘルプコマンドだった場合
     if context.command.name == 'help':
         return True
@@ -33,6 +30,9 @@ async def check_command_permission(context):
     #  ない場合
     if not p:
         return False
+
+    if context.author.guild_permissions.administrator:
+        return True
 
     #  制限なしの場合
     if not p.roles and not p.users:

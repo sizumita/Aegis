@@ -1,6 +1,8 @@
-import json
 import os
-
+import aiohttp
+import json
+import io
+import discord
 from discord.ext import commands
 
 from cogs.utils.checks import check_command_permission
@@ -58,3 +60,19 @@ class Aegis(commands.Bot):
         name += command.qualified_name
 
         return name
+
+    @staticmethod
+    async def get_json(url):
+        async with aiohttp.ClientSession() as session:
+            r = await session.get(url)
+
+        return await r.json()
+
+    @staticmethod
+    async def get_image(url):
+        async with aiohttp.ClientSession() as session:
+            r = await session.get(url)
+
+        buffer = io.BytesIO(await r.read())
+        buffer.seek(0)
+        return discord.File(fp=buffer, filename='image.png')
