@@ -78,6 +78,45 @@ class Math(commands.Cog):
         """角 x を度からラジアンに変換します。"""
         await ctx.send(math.radians(x))
 
+    @commands.command()
+    async def rpn(self, ctx, *, formula):
+        calcs = {
+            # l: list, (計算結果, 計算に使った数字の個数)
+            '*': lambda l: (l[1] * l[0], 2),
+            '/': lambda l: (l[1] / l[0], 2),
+            '-': lambda l: (l[1] - l[0], 2),
+            '+': lambda l: (l[1] + l[0], 2),
+            '**': lambda l: (l[1] ** l[0], 2),
+            'sin': lambda l: (math.sin(l[0]), 1),
+            'cos': lambda l: (math.cos(l[0]), 1),
+            'tan': lambda l: (math.tan(l[0]), 1),
+            'sqrt': lambda l: (math.sqrt(l[0]), 1),
+            'gcd': lambda l: (math.gcd(l[0], l[1]), 2),
+
+        }
+        algebras = {
+            'pi': math.pi,
+        }
+        result = []
+        try:
+            for x in formula.split(' '):
+                if x in calcs.keys():
+                    c = calcs[x](result[::-1])
+                    del result[-1 * c[1]:]
+                    result.append(c[0])
+                    continue
+
+                if x in algebras.keys():
+                    result.append(algebras[x])
+                    continue
+
+                result.append(float(x) if "." in x else int(x))
+                continue
+        except:
+            await ctx.send("計算エラー")
+            raise
+        await ctx.send(result[0])
+
 
 def setup(bot):
     return bot.add_cog(Math(bot))

@@ -32,6 +32,7 @@ class Fun(commands.Cog):
         await ctx.send(url)
 
     @commands.command('yesno')
+    @commands.cooldown(2, 20)
     async def yes_no(self, ctx):
         """
         YesかNoで答えてくれます。

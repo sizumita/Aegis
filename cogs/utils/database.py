@@ -1,11 +1,11 @@
-from gino import Gino, GinoEngine
+from gino import Gino
 
 db = Gino()
 
 
 class CommandPermission(db.Model):
     __tablename__ = 'permission'
-    number = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    number = db.Column(db.BigInteger, autoincrement=True, primary_key=True)
     id = db.Column(db.BigInteger)
     name = db.Column(db.String(100))
     roles = db.Column(db.String(2000), default='')  # 使えるroleのリスト、,で区切る

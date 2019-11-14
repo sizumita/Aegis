@@ -4,3 +4,4 @@
 *.pyi
 *.pyx
 .idea/*
+.python-version
