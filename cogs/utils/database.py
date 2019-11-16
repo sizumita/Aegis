@@ -12,6 +12,16 @@ class CommandPermission(db.Model):
     users = db.Column(db.String(2000), default='')  # 使えるuserのリスト、,で区切る
 
 
+class CommandHistory(db.Model):
+    __tablename__ = 'history'
+    id = db.Column(db.BigInteger, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.BigInteger)
+    command = db.Column(db.String(80))
+    channel_id = db.Column(db.BigInteger)
+    guild_id = db.Column(db.BigInteger)
+    timestamp = db.Column(db.BigInteger)
+
+
 def get(_id, name):
     return CommandPermission.query.where(CommandPermission.id == _id).where(CommandPermission.name == name).gino.first()
 
