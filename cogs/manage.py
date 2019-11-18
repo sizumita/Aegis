@@ -74,7 +74,7 @@ class Manage(Cog):
 
         await ctx.send(embed=embed)
 
-    @command.command(aliases=['allow'])
+    @command.group(aliases=['allow'], invoke_without_command=True)
     @admin_only()
     async def enable(self, ctx: Context, *, command_name):
         """コマンドを有効化します。大文字から始めるとCogの名前とみなされ、そのCogのコマンドが全て有効化されます。（例: `cmd allow Math`）"""
@@ -116,7 +116,19 @@ class Manage(Cog):
 
             await ctx.send('コマンド:' + ','.join([f'`{_.qualified_name}`' for _ in changed_commands]) + 'を有効化しました。')
 
-    @command.command(aliases=['deny'])
+    @enable.command(name='all')
+    async def enable_all(self, ctx):
+        """全てのコマンドを有効化します。"""
+        for command in self.bot.walk_commands():
+            name = self.bot.get_command_full_name(command)
+            if await is_exist(ctx.guild.id, name):
+                continue
+
+            await create(ctx.guild.id, name)
+
+        await ctx.send('有効化されていないコマンドを全て有効化しました。')
+
+    @command.group(aliases=['deny'], invoke_without_command=True)
     @admin_only()
     async def disable(self, ctx: Context, *, command_name):
         """コマンドを無効化します。設定した権限は初期化されます。
@@ -161,6 +173,18 @@ class Manage(Cog):
                 changed_commands.append(command)
 
             await ctx.send('コマンド:' + ','.join([f'`{_.qualified_name}`' for _ in changed_commands]) + 'を無効化しました。')
+
+    @disable.command(name='all')
+    async def disable_all(self, ctx):
+        """全てのコマンドを無効化します。"""
+        for command in self.bot.walk_commands():
+            name = self.bot.get_command_full_name(command)
+            if not await is_exist(ctx.guild.id, name):
+                continue
+
+            await delete(ctx.guild.id, name)
+
+        await ctx.send('有効化されているコマンドを全て無効化しました。')
 
     @commands.group()
     @commands.guild_only()
