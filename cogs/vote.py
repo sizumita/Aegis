@@ -24,11 +24,27 @@ keys = [
 ]
 
 
+class VoteData:
+    def __init__(self, message, secret=False):
+        self.message = message,
+        self.secret = secret
+
+    async def add_reaction(self, emoji):
+        pass
+
+
 class Vote(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.votes = {}
 
-    @commands.group()
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        if payload.message_id in self.votes.keys():
+            await self.votes[payload.message_id].add_reaction(str(payload.emoji))
+
+    @commands.group(invoke_without_command=True)
+    @commands.guild_only()
     async def vote(self, ctx, title, *choices):
         """投票を作成します。choicesには`選択肢をスペース区切りで入れてください。`"""
         embed = discord.Embed(title=title, color=0x00bfff)
@@ -39,12 +55,16 @@ class Vote(commands.Cog):
         using_emojis = []
 
         for key, choice in zip(keys, choices):
-            embed.add_field(name=key, value=choice)
+            embed.add_field(name=key, value=choice, inline=False)
             using_emojis.append(key)
 
         msg = await ctx.send(embed=embed)
         for emoji in using_emojis:
             await msg.add_reaction(emoji)
+
+    @vote.command()
+    async def secret(self, ctx, title, *choices):
+        """誰が投票したのかわからなくする秘匿投票用のコマンドです。choicesには`選択肢をスペース区切りで入れてください。`"""
 
 
 def setup(bot):
