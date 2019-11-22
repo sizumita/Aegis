@@ -5,7 +5,7 @@ import io
 import discord
 from discord.ext import commands
 from cogs.utils.checks import check_command_permission
-from cogs.utils.database import db, Alias
+from cogs.utils.database import db, Alias, CommandHistory
 from cogs.utils.helpcommand import PaginatedHelpCommand
 import traceback
 
@@ -70,6 +70,22 @@ class Aegis(commands.Bot):
         message.content = all_content
         return message
 
+    async def set_command_history(self, context: commands.Context):
+        await CommandHistory.create(user_id=context.author.id,
+                                    command=self.get_command_full_name(context.command),
+                                    channel_id=context.channel.id,
+                                    guild_id=0 if context.guild else context.guild.id,
+                                    timestamp=context.message.created_at.timestamp(),
+                                    )
+        channel = self.get_channel(583290964043366411)
+        embed = discord.Embed(title=f'コマンド:{self.get_command_full_name(context.command)}',
+                              description=f'guild={context.guild}\nユーザー{context.author}')
+        if context.guild:
+            embed.add_field(name='チャンネル', value=f'カテゴリー: {context.channel.category}: {context.channel.name}')
+        embed.add_field(name='コマンド内容', value=f'`{context.message.content}`')
+        embed.add_field(name='リンク', value=f'{context.channel.mention} [メッセージリンク]({discord.Message.jump_url})')
+        await channel.send(embed=embed)
+
     async def on_message(self, message):
         if message.author.bot:
             return
@@ -82,6 +98,7 @@ class Aegis(commands.Bot):
 
         if await check_command_permission(context):
             await self.invoke(context)
+            await self.set_command_history(context)
 
     @staticmethod
     def get_command_full_name(command: commands.Command):
