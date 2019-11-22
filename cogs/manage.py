@@ -1,23 +1,12 @@
 from discord.ext import commands
-from discord.ext.commands import Cog, Context, Bot, check
-from .utils.checks import check_command_permission
+from discord.ext.commands import Cog, Context
+from .utils.checks import check_command_permission, admin_only
 from .utils.context import FakeContext
 from .utils.database import is_exist, create, get, add_role, add_user, delete, \
     CommandPermission, delete_role, delete_user
 from bot import Aegis
 from typing import Union
 import discord
-
-
-def admin_only():
-    def predicate(ctx):
-        permissions: discord.Permissions = ctx.author.guild_permissions
-
-        if not permissions.administrator:
-            return False
-        return True
-
-    return check(predicate)
 
 
 def can_change_permission(command):
@@ -192,7 +181,7 @@ class Manage(Cog):
     async def permit(self, ctx):
         """コマンドの権限を変更します。サブコマンドの指定が可能です。"""
 
-    @permit.group()
+    @permit.command()
     async def role(self, ctx, action, role: discord.Role, *, command_name):
         """役職を設定・解除します。役職のメンションまたはid、名前で指定可能です。
         actionが[set, add, new]で追加、[reset, remove, delete]で削除を行います。
@@ -229,7 +218,7 @@ class Manage(Cog):
         else:
             await ctx.send('不明なactionです。')
 
-    @permit.group()
+    @permit.command()
     async def user(self, ctx, action, user: Union[discord.User, discord.Member], *, command_name):
         """役職を設定・解除します。役職のメンションまたはid、名前で指定可能です。
         actionが[set, add, new]で追加、[reset, remove, delete]で削除を行います。

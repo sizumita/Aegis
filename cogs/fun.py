@@ -3,6 +3,8 @@ import discord
 
 
 class Fun(commands.Cog):
+    already_on = True
+
     def __init__(self, bot):
         self.bot = bot
 

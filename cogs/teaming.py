@@ -1,6 +1,14 @@
 from discord.ext import commands
 import random
 import numpy as np
+import discord
+
+
+def format_team(teams):
+    embed = discord.Embed(title='チーム一覧')
+    for i, team in enumerate(teams):
+        embed.add_field(name=f'チーム{i}', value='\n'.join([user.mention for user in team]))
+    return embed
 
 
 class Teaming(commands.Cog):
@@ -17,13 +25,9 @@ class Teaming(commands.Cog):
             await ctx.send('チームの数に対してユーザーの数が足りません。')
             return
 
-        text = ""
-
         teams = np.array_split(members, team_count)
-        for i, team in enumerate(teams, start=1):
-            text += '`--- チーム{0} ---`\n{1}\n'.format(i, '\n'.join([user.mention for user in team]))
 
-        await ctx.send(text)
+        await ctx.send(embed=format_team(teams))
 
     @teaming.command()
     async def voice(self, ctx, team_count: int):
@@ -36,13 +40,9 @@ class Teaming(commands.Cog):
         members = [member for member in voice_channel.members if not member.bot]
         random.shuffle(members)
 
-        text = ""
-
         teams = np.array_split(members, team_count)
-        for i, team in enumerate(teams, start=1):
-            text += '`--- チーム{0} ---`\n{1}\n'.format(i, '\n'.join([user.mention for user in team]))
 
-        await ctx.send(text)
+        await ctx.send(embed=format_team(teams))
 
 
 def setup(bot):

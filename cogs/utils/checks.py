@@ -1,4 +1,6 @@
 from .database import CommandPermission
+from discord.ext.commands import check
+import discord
 
 
 async def check_command_permission(context):
@@ -29,7 +31,12 @@ async def check_command_permission(context):
 
     #  ない場合
     if not p:
-        return False
+
+        if getattr(context.cog, 'already_on', False):
+            p = await CommandPermission.create(id=context.guild.id,
+                                               name=context.bot.get_command_full_name(context.command))
+        else:
+            return False
 
     if context.author.guild_permissions.administrator:
         return True
@@ -49,3 +56,33 @@ async def check_command_permission(context):
         checks.append(True if str(context.author.id) in p.users else False)
 
     return any(checks)
+
+
+def admin_only():
+    def predicate(ctx):
+        permissions: discord.Permissions = ctx.author.guild_permissions
+
+        if not permissions.administrator:
+            return False
+        return True
+
+    return check(predicate)
+
+
+def safety():
+    """CommandPermissionがあってかつ何も設定されていないときにadminしか実行できないようにする"""
+    def predicate(ctx):
+        p: CommandPermission = await CommandPermission.query.where(CommandPermission.id == ctx.guild.id) \
+            .where(CommandPermission.name == ctx.bot.get_command_full_name(ctx.command)).gino.first()
+        if not p:
+            return False
+
+        if not p.users and not p.roles:
+            permissions: discord.Permissions = ctx.author.guild_permissions
+
+            if not permissions.administrator:
+                return False
+
+        return True
+
+    return check(predicate)

@@ -4,6 +4,8 @@ from .utils.database import Alias as _Alias
 
 
 class Alias(commands.Cog):
+    already_on = True
+
     def __init__(self, bot):
         self.bot = bot
 
