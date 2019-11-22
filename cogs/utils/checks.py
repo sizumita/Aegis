@@ -69,7 +69,7 @@ def admin_only():
     return check(predicate)
 
 
-def safety(ctx):
+async def safety(ctx):
     """CommandPermissionがあってかつ何も設定されていないときにadminしか実行できないようにする"""
     p: CommandPermission = await CommandPermission.query.where(CommandPermission.id == ctx.guild.id) \
         .where(CommandPermission.name == ctx.bot.get_command_full_name(ctx.command)).gino.first()
