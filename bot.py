@@ -5,7 +5,6 @@ import io
 import discord
 import re
 from discord.ext import commands
-
 from cogs.utils.checks import check_command_permission
 from cogs.utils.database import db, Alias
 from cogs.utils.helpcommand import PaginatedHelpCommand
@@ -34,6 +33,13 @@ class Aegis(commands.Bot):
             with open('./prefixes.json', 'r') as f:
                 self.prefixes = json.load(f)
 
+    async def rolling_presence(self):
+        await self.wait_until_ready()
+        presences = ['Aegis - A discord Bot', 'help -> .help', '']
+        i = 0
+        while not self.is_closed():
+            break
+
     async def close(self):
         await super().close()
         with open('prefixes.json', 'w', encoding='utf-8') as f:
@@ -42,7 +48,7 @@ class Aegis(commands.Bot):
     async def check_alias(self, message):
         aliases = await Alias.query.where(Alias.user_id == message.author.id).gino.all()
         prefix = [prefix for prefix in await self.get_prefix(message) if message.content.startswith(prefix)]
-        if not prefix[0]:
+        if not prefix:
             return message
 
         all_content = message.content
