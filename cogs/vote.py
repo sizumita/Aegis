@@ -32,6 +32,8 @@ class VoteData:
     async def add_reaction(self, emoji):
         pass
 
+    #  TODO: 処理書く
+
 
 class Vote(commands.Cog):
     def __init__(self, bot):

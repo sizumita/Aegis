@@ -33,6 +33,13 @@ def split_text(ctx, text: str):
                 text = text.replace(f'<:{emoji.name}:{emoji.id}>', '', 1)
                 continue
 
+        elif match := re.match('^<a:.+:([0-9]+)>', text):
+            emoji = ctx.bot.get_emoji(int(match.groups()[0]))
+            if emoji:
+                text_list.append(emoji)
+                text = text.replace(f'<a:{emoji.name}:{emoji.id}>', '', 1)
+                continue
+
         if not text_list:
             text_list.append(text[0])
             text = text.replace(text[0], '', 1)

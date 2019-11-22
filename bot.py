@@ -3,10 +3,11 @@ import aiohttp
 import json
 import io
 import discord
+import re
 from discord.ext import commands
 
 from cogs.utils.checks import check_command_permission
-from cogs.utils.database import db
+from cogs.utils.database import db, Alias
 from cogs.utils.helpcommand import PaginatedHelpCommand
 
 
@@ -38,10 +39,27 @@ class Aegis(commands.Bot):
         with open('prefixes.json', 'w', encoding='utf-8') as f:
             json.dump(self.prefixes, f, indent=4)
 
-    async def on_message(self, message):
+    async def check_alias(self, message):
+        aliases = await Alias.query.where(Alias.user_id == message.author.id).gino.all()
+        prefix = [prefix for prefix in await self.get_prefix(message) if message.content.startswith(prefix)]
+        if not prefix[0]:
+            return message
 
+        all_content = message.content
+        content = message.content.replace(prefix[0], '', 1)
+        for alias in aliases:
+            if content.startswith(alias.name):
+                all_content = all_content.replace(alias.name, alias.command, 1)
+                break
+        message.content = all_content
+        return message
+
+    async def on_message(self, message):
         if message.author.bot:
             return
+
+        message = await self.check_alias(message)
+
         context = await self.get_context(message)
         if not context.command:
             return

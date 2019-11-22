@@ -19,9 +19,13 @@ class Moji(commands.Cog):
 
     @moji.command()
     async def discord(self, ctx, *, text):
-        """Discordのロゴのフォントを使用します。英語・数字・記号のみ対応です。カスタム絵文字・ユニコード絵文字も使用可能です。"""
-        await ctx.send(file=discord.File(await draw_string(ctx, text, font='./cogs/utils/otf/Uni Sans Heavy.otf'),
-                                         filename='image.png'))
+        """Discordのロゴのフォントを使用します。英語・数字・記号のみ対応です。カスタム絵文字・ユニコード絵文字も使用可能です。複数行表示可能です。"""
+        if '\n' in text:
+            buffer = await draw_lines(ctx, text, font='./cogs/utils/otf/Uni Sans Heavy.otf')
+        else:
+            buffer = await draw_string(ctx, text, font='./cogs/utils/otf/Uni Sans Heavy.otf')
+
+        await ctx.send(file=discord.File(buffer, filename='image.png'))
 
 
 def setup(bot):

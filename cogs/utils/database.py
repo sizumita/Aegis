@@ -22,6 +22,14 @@ class CommandHistory(db.Model):
     timestamp = db.Column(db.BigInteger)
 
 
+class Alias(db.Model):
+    __tablename__ = 'alias'
+    id = db.Column(db.BigInteger, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.BigInteger)
+    name = db.Column(db.String(200))
+    command = db.Column(db.String(200))
+
+
 def get(_id, name):
     return CommandPermission.query.where(CommandPermission.id == _id).where(CommandPermission.name == name).gino.first()
 
