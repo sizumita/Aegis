@@ -3,11 +3,11 @@ import aiohttp
 import json
 import io
 import discord
-import re
 from discord.ext import commands
 from cogs.utils.checks import check_command_permission
 from cogs.utils.database import db, Alias
 from cogs.utils.helpcommand import PaginatedHelpCommand
+import traceback
 
 
 def _prefix_callable(bot, msg):
@@ -39,6 +39,16 @@ class Aegis(commands.Bot):
         i = 0
         while not self.is_closed():
             break
+
+    async def on_command_error(self, context, exception):
+        if isinstance(exception, commands.MissingRequiredArgument):
+            await context.send('引数が足りません。')
+        elif isinstance(exception, commands.CommandNotFound):
+            pass
+        elif isinstance(exception, commands.CommandOnCooldown):
+            await context.send('クールダウン中です。時間をおいて実行してください。')
+        else:
+            traceback.print_exc()
 
     async def close(self):
         await super().close()
