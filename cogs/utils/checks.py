@@ -69,20 +69,18 @@ def admin_only():
     return check(predicate)
 
 
-def safety():
+def safety(ctx):
     """CommandPermissionがあってかつ何も設定されていないときにadminしか実行できないようにする"""
-    def predicate(ctx):
-        p: CommandPermission = await CommandPermission.query.where(CommandPermission.id == ctx.guild.id) \
-            .where(CommandPermission.name == ctx.bot.get_command_full_name(ctx.command)).gino.first()
-        if not p:
+    p: CommandPermission = await CommandPermission.query.where(CommandPermission.id == ctx.guild.id) \
+        .where(CommandPermission.name == ctx.bot.get_command_full_name(ctx.command)).gino.first()
+    if not p:
+        return False
+
+    if not p.users and not p.roles:
+        permissions: discord.Permissions = ctx.author.guild_permissions
+
+        if not permissions.administrator:
             return False
 
-        if not p.users and not p.roles:
-            permissions: discord.Permissions = ctx.author.guild_permissions
+    return True
 
-            if not permissions.administrator:
-                return False
-
-        return True
-
-    return check(predicate)
