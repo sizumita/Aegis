@@ -4,6 +4,8 @@ from .utils.generating import draw_lines, draw_string
 
 
 class Moji(commands.Cog):
+    already_on = True
+
     def __init__(self, bot):
         self.bot = bot
 

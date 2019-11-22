@@ -33,7 +33,7 @@ class Manage(Cog):
 
     @commands.command()
     async def usage(self, ctx):
-        """このBOTの使用方法や設定方法などを表示します。"""
+        """コマンド名を指定するとコマンドの使い方を"""
 
     @commands.group(aliases=['cmd'], invoke_without_command=True)
     @commands.guild_only()
