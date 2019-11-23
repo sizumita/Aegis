@@ -42,3 +42,7 @@ class Impression(commands.Cog):
                 message_id=message.id,
             )
 
+
+def setup(bot):
+    return bot.add_cog(Impression(bot))
+
