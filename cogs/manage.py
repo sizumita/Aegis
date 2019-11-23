@@ -7,6 +7,7 @@ from .utils.database import is_exist, create, get, add_role, add_user, delete, \
 from bot import Aegis
 from typing import Union
 import discord
+from pathlib import Path, PurePath
 
 
 def can_change_permission(command):
@@ -32,8 +33,26 @@ class Manage(Cog):
         return command
 
     @commands.command()
-    async def usage(self, ctx):
-        """コマンド名を指定するとコマンドの使い方を"""
+    async def usage(self, ctx, *command):
+        """コマンド名を指定するとコマンドの使い方を表示します。サブコマンドは必要ありません。"""
+        p = Path.cwd()/'cogs'/'utils'/'usages'/f'{command[0]}.md'
+        if not p.exists():
+            await ctx.send('そのコマンドの使い方はまだ書かれていないようです。')
+            return
+        with p.open('r') as f:
+            lines = f.read().split('\n')
+        embed = discord.Embed(title=f'コマンド:{command[0]}の使い方一覧')
+        while lines:
+            line = lines.pop(0)
+            if line.startswith('#'):
+                name = line[2:]
+                value = ''
+                while lines and not lines[0].startswith('#'):
+                    value += lines.pop(0) + '\n'
+
+                embed.add_field(name=name, value=value, inline=False)
+
+        await ctx.send(embed=embed)
 
     @commands.group(aliases=['cmd'], invoke_without_command=True)
     @commands.guild_only()
