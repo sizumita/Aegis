@@ -47,7 +47,7 @@ class Moji(commands.Cog):
     @moji.command()
     async def custom(self, ctx, *, contents):
         """色などをカスタマイズして画像として表示するコマンドです。１行目に設定、２行目以降に文章を書いてください。複数行表示可能です。
-        カスタマイズの設定は、`パラメーター1 値 パラメーター2 値`のような書式で指定してください。
+        カスタマイズの設定は、`パラメーター1=値 パラメーター2=値`のような書式で指定してください。
         また、画像ファイルを添付した場合、
         **パラメーター一覧([]内はエイリアスです)**
         size[s]: 文字のサイズを指定します。デフォルト: 100
@@ -87,7 +87,6 @@ class Moji(commands.Cog):
             buffer = await draw_string(ctx, text, **payload)
 
         await ctx.send(file=discord.File(buffer, filename='image.png'))
-
 
 
 def setup(bot):

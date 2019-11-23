@@ -69,17 +69,12 @@ class Aegis(commands.Bot):
 
     async def check_alias(self, message):
         aliases = await Alias.query.where(Alias.user_id == message.author.id).gino.all()
-        prefix = [prefix for prefix in await self.get_prefix(message) if message.content.startswith(prefix)]
-        if not prefix:
-            return message
 
-        all_content = message.content
-        content = message.content.replace(prefix[0], '', 1)
         for alias in aliases:
-            if content.startswith(alias.name):
-                all_content = all_content.replace(alias.name, alias.command, 1)
+            if message.content == alias.name:
+                message.content = alias.command
                 break
-        message.content = all_content
+
         return message
 
     async def set_command_history(self, context: commands.Context):
