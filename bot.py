@@ -93,7 +93,10 @@ class Aegis(commands.Bot):
             embed.add_field(name='チャンネル', value=f'カテゴリー: {context.channel.category}: {context.channel.name}')
         embed.add_field(name='コマンド内容', value=f'`{context.message.content}`')
         embed.add_field(name='リンク', value=f'{context.channel.mention} [メッセージリンク]({discord.Message.jump_url})')
-        await channel.send(embed=embed)
+        try:
+            await channel.send(embed=embed)
+        except AttributeError:
+            pass
 
     async def on_message(self, message):
         if message.author.bot:
