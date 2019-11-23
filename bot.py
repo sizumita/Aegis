@@ -8,6 +8,7 @@ from cogs.utils.checks import check_command_permission
 from cogs.utils.database import db, Alias, CommandHistory
 from cogs.utils.helpcommand import PaginatedHelpCommand
 import traceback
+import asyncio
 
 
 def _prefix_callable(bot, msg):
@@ -33,12 +34,20 @@ class Aegis(commands.Bot):
             with open('./prefixes.json', 'r') as f:
                 self.prefixes = json.load(f)
 
+        self.loop.create_task(self.rolling_presence())
+
     async def rolling_presence(self):
         await self.wait_until_ready()
-        presences = ['Aegis - A discord Bot', 'help -> .help', '']
+        presences = ['Aegis - A discord Bot', 'help -> .help']
         i = 0
         while not self.is_closed():
-            break
+            await self.change_presence(activity=discord.Game(name=presences[i]))
+            await asyncio.sleep(5)
+
+            if i == len(presences) - 1:
+                i = 0
+            else:
+                i += 1
 
     async def on_command_error(self, context, exception):
         if isinstance(exception, commands.MissingRequiredArgument):
