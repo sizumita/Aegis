@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 from .utils.database import Impression as DB_Impression
+import datetime
 
 
 class Impression(commands.Cog):
@@ -29,6 +30,7 @@ class Impression(commands.Cog):
             count=1,
             type=f'reaction:{payload.emoji}',
             message_id=payload.message_id,
+            timestamp=datetime.datetime.now().timestamp()
         )
 
     @commands.Cog.listener()
@@ -48,6 +50,7 @@ class Impression(commands.Cog):
                 count=2,
                 type=f'message',
                 message_id=message.id,
+                timestamp=datetime.datetime.now().timestamp()
             )
 
 

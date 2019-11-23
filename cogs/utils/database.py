@@ -37,6 +37,7 @@ class Impression(db.Model):
     count = db.Column(db.BigInteger)
     type = db.Column(db.String(200))
     message_id = db.Column(db.BigInteger)
+    timestamp = db.Column(db.BigInteger)
 
 
 def get(_id, name):
