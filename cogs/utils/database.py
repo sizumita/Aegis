@@ -30,6 +30,15 @@ class Alias(db.Model):
     command = db.Column(db.String(200))
 
 
+class Impression(db.Model):
+    __tablename__ = 'impression'
+    id = db.Column(db.BigInteger, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.BigInteger)
+    count = db.Column(db.BigInteger)
+    type = db.Column(db.String(200))
+    message_id = db.Column(db.BigInteger)
+
+
 def get(_id, name):
     return CommandPermission.query.where(CommandPermission.id == _id).where(CommandPermission.name == name).gino.first()
 
