@@ -6,7 +6,7 @@ from .utils.generating import draw_lines, draw_string
 
 change_types = {
     ('s', 'size'): int,
-    ('width', 'w'): float,
+    ('width', 'bw'): float,
 }
 name_to_kwargs = {
     's': 'size',
