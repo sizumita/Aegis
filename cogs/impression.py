@@ -18,6 +18,11 @@ class Impression(commands.Cog):
 
         if message.author.id == payload.user_id:
             return
+        if message.author.bot:
+            return
+        payload_user = self.bot.get_user(payload.user_id)
+        if payload_user.bot:
+            return
 
         await DB_Impression.create(
             user_id=message.author.id,
