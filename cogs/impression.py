@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord
+from typing import Union
 from .utils.database import Impression as DB_Impression
 import datetime
 
@@ -44,7 +45,7 @@ class Impression(commands.Cog):
         if context.command:
             return
 
-        for user in message.mentions:
+        for user in set(message.mentions):
             await DB_Impression.create(
                 user_id=user.id,
                 count=2,
@@ -52,6 +53,15 @@ class Impression(commands.Cog):
                 message_id=message.id,
                 timestamp=datetime.datetime.now().timestamp()
             )
+
+    @commands.group(aliases=['imp'])
+    async def impression(self, ctx, user: Union[discord.Member, discord.User] = None):
+        if not user:
+            user = ctx.author
+
+        impressions = await DB_Impression.query.where(DB_Impression.user_id == user.id).gino.all()
+        count = sum([imp.count for imp in impressions])
+        await ctx.send(f'あなたのインプレッション数は{count}です。')
 
 
 def setup(bot):
