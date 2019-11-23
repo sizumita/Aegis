@@ -16,6 +16,9 @@ class Impression(commands.Cog):
         if imp:
             return
 
+        if message.author.id == payload.user_id:
+            return
+
         await DB_Impression.create(
             user_id=message.author.id,
             count=1,
