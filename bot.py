@@ -8,6 +8,7 @@ from cogs.utils.checks import check_command_permission
 from cogs.utils.database import db, Alias, CommandHistory
 from cogs.utils.helpcommand import PaginatedHelpCommand
 import traceback
+import sys
 import asyncio
 
 
@@ -57,7 +58,9 @@ class Aegis(commands.Bot):
         elif isinstance(exception, commands.CommandOnCooldown):
             await context.send('クールダウン中です。時間をおいて実行してください。')
         else:
-            traceback.print_exc()
+
+            print('Ignoring exception in command {}:'.format(context.command), file=sys.stderr)
+            traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
 
     async def close(self):
         await super().close()
