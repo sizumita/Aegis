@@ -67,11 +67,11 @@ class Reaction(commands.Cog):
             return
 
         while selects:
-            emoji_name = selects.pop(0)
+            emoji_name = selects.pop(0).replace(' ', '')
             if emoji_name in UNICODE_EMOJI.keys():
                 emoji = emoji_name
             else:
-                emoji = self.bot.get_emoji()
+                emoji = self.bot.get_emoji(emoji_name)
             role_name = selects.pop(0)
             role = discord.utils.get(ctx.guild.roles, name=role_name)
 
