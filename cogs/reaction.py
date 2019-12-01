@@ -2,6 +2,7 @@ from discord.ext import commands
 from pathlib import Path
 import discord
 import json
+from emoji import UNICODE_EMOJI
 
 
 class Reaction(commands.Cog):
@@ -60,7 +61,11 @@ class Reaction(commands.Cog):
             return
 
         while selects:
-            emoji = self.bot.get_emoji(selects.pop(0))
+            emoji_name = selects.pop(0)
+            if emoji_name in UNICODE_EMOJI.keys():
+                emoji = emoji_name
+            else:
+                emoji = self.bot.get_emoji()
             role_name = selects.pop(0)
             role = discord.utils.get(ctx.guild.roles, name=role_name)
 
