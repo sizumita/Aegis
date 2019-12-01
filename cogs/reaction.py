@@ -82,3 +82,7 @@ class Reaction(commands.Cog):
             json.dump(self.reactions, f)
 
         await ctx.send('完了しました。')
+
+
+def setup(bot):
+    return bot.add_cog(Reaction(bot))
