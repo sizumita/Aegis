@@ -35,7 +35,10 @@ class Reaction(commands.Cog):
         role = guild.get_role(self.reactions[payload.message_id][str(payload.emoji)])
         if not role:
             return
-        await member.add_roles(role)
+        try:
+            await member.add_roles(role)
+        except discord.Forbidden:
+            pass
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
@@ -48,7 +51,10 @@ class Reaction(commands.Cog):
         role = guild.get_role(self.reactions[payload.message_id][str(payload.emoji)])
         if not role:
             return
-        await member.remove_roles(role)
+        try:
+            await member.remove_roles(role)
+        except discord.Forbidden:
+            pass
 
     @commands.command(name='reactionrole')
     async def reaction_role(self, ctx, message: discord.Message, *selects):
