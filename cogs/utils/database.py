@@ -40,6 +40,15 @@ class Impression(db.Model):
     timestamp = db.Column(db.BigInteger)
 
 
+class VisitMemberAnalytics(db.Model):
+    __tablename__ = 'memberanalytics'
+    id = db.Column(db.BigInteger, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.BigInteger)
+    type = db.Column(db.String(200))  # join or remove
+    guild_id = db.Column(db.BigInteger)
+    timestamp = db.Column(db.BigInteger)
+
+
 def get(_id, name):
     return CommandPermission.query.where(CommandPermission.id == _id).where(CommandPermission.name == name).gino.first()
 
