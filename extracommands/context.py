@@ -7,6 +7,7 @@ class ExtraContext(commands.Context):
         self.be_piped = attrs.pop('be_piped', False)
         self.passed_pipe_content = attrs.pop('passed_pipe_content', None)
         self.pipe_contents = []
+        self.view_content = ''
 
     async def send(self, content=None, *, tts=False, embed=None, file=None, files=None, delete_after=None, nonce=None):
         if self.be_piped:

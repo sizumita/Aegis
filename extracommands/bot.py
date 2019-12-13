@@ -65,11 +65,10 @@ class Bot(commands.Bot):
         contexts = []
         command_contents = message.content.split(' |> ')
 
-        _message = message
-        _message.content = command_contents[0]
-
-        view = StringView(command_contents.pop(0))
-        ctx = cls(prefix=None, view=view, bot=self, message=_message)
+        first_content = command_contents.pop(0)
+        view = StringView(first_content)
+        ctx = cls(prefix=None, view=view, bot=self, message=message)
+        ctx.view_content = first_content
         if command_contents:
             ctx.be_piped = True
 
@@ -107,17 +106,27 @@ class Bot(commands.Bot):
         while command_contents:
             content = command_contents.pop(0)
 
-            _message = message
-            _message.content = invoked_prefix + content.lstrip(' ')
+            # _message = message
+            view_content = invoked_prefix + content.lstrip(' ')
 
-            ctx = self.get_ctx(_message, invoked_prefix, cls=cls)
+            ctx = self.get_ctx(message, view_content, invoked_prefix, cls=cls)
+
+            if not ctx.command:
+                view_content = contexts[-1].view_content + ' |> ' + content
+                ctx = self.get_ctx(message, view_content, invoked_prefix, cls=cls)
+                ctx.be_piped = contexts[-1].be_piped
+                if not command_contents:
+                    ctx.be_piped = False
+
+                contexts[-1] = ctx
+                continue
 
             try:
                 await ctx.command._parse_arguments(ctx)
-            except Exception:
-                ctx = self.get_ctx(_message, invoked_prefix, cls=cls)
+            except commands.MissingRequiredArgument:
+                ctx = self.get_ctx(message, view_content, invoked_prefix, cls=cls)
             else:
-                ctx = self.get_ctx(_message, invoked_prefix, cls=cls)
+                ctx = self.get_ctx(message, view_content, invoked_prefix, cls=cls)
                 contexts[-1].be_piped = False
 
             if command_contents:
@@ -127,8 +136,8 @@ class Bot(commands.Bot):
 
         return contexts
 
-    def get_ctx(self, message, invoked_prefix, *, cls=ExtraContext):
-        view = StringView(message.content)
+    def get_ctx(self, message, view_content, invoked_prefix, *, cls=ExtraContext):
+        view = StringView(view_content)
         ctx = cls(prefix=None, view=view, bot=self, message=message)
         ctx.prefix = invoked_prefix
         view.skip_string(invoked_prefix)
@@ -136,6 +145,7 @@ class Bot(commands.Bot):
         invoker = view.get_word()
         ctx.invoked_with = invoker
         ctx.command = self.all_commands.get(invoker)
+        ctx.view_content = view_content
 
         return ctx
 
