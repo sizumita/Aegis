@@ -1,12 +1,15 @@
 import discord
+from extracommands import core
 from discord.ext import commands
 
 
 class SnowFlake(commands.Cog):
+    already_on = True
+
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @core.command()
     async def timestamp(self, ctx, id: int):
         """指定されたIDから時刻情報を取得します。
         IDには、役職やメッセージ、チャンネルなどのIDを指定できます。"""

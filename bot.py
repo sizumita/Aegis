@@ -10,6 +10,7 @@ from cogs.utils.helpcommand import PaginatedHelpCommand
 import traceback
 import sys
 import asyncio
+from extracommands import Bot
 
 
 def _prefix_callable(bot, msg):
@@ -23,7 +24,7 @@ def _prefix_callable(bot, msg):
     return base
 
 
-class Aegis(commands.Bot):
+class Aegis(Bot):
     prefixes = {}
 
     def __init__(self):
@@ -96,19 +97,32 @@ class Aegis(commands.Bot):
         except AttributeError:
             pass
 
+    async def invoke_group(self, group):
+        invoked_context = None
+        for context in group.contexts:
+            if invoked_context and invoked_context.pipe_contents:
+                context.passed_pipe_content = '\n'.join(invoked_context.pipe_contents)
+            await self.invoke(context)
+            invoked_context = context
+            await self.set_command_history(context)
+
     async def on_message(self, message):
         if message.author.bot:
             return
 
         message = await self.check_alias(message)
 
-        context = await self.get_context(message)
-        if not context.command:
-            return
+        _groups = []
+        groups = await self.get_context_groups(message)
+        for group in groups:
+            _ = []
+            for ctx in group.contexts:
+                _.append(await check_command_permission(ctx))
+            if all(_):
+                _groups.append(group)
 
-        if await check_command_permission(context):
-            await self.invoke(context)
-            await self.set_command_history(context)
+        for group in _groups:
+            self.loop.create_task(self.invoke_group(group))
 
     @staticmethod
     def get_command_full_name(command: commands.Command):

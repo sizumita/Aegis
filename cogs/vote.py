@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord
+from extracommands import core
 keys = [
     '\N{REGIONAL INDICATOR SYMBOL LETTER A}',
     '\N{REGIONAL INDICATOR SYMBOL LETTER B}',
@@ -45,7 +46,7 @@ class Vote(commands.Cog):
         if payload.message_id in self.votes.keys():
             await self.votes[payload.message_id].add_reaction(str(payload.emoji))
 
-    @commands.group(invoke_without_command=True)
+    @core.group(invoke_without_command=True)
     @commands.guild_only()
     async def vote(self, ctx, title, *choices):
         """投票を作成します。choicesには`選択肢をスペース区切りで入れてください。`"""

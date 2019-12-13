@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import re
+from extracommands import core
 from .utils.generating import draw_lines, draw_string
 
 
@@ -24,7 +25,7 @@ class Moji(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(invoke_without_command=True)
+    @core.group(invoke_without_command=True)
     async def moji(self, ctx, *, text):
         """テキストを画像にして表示します。カスタム絵文字・ユニコード絵文字も使用可能です。複数行表示可能です。"""
         if '\n' in text:

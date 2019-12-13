@@ -2,6 +2,7 @@ from discord.ext import commands
 from pathlib import Path
 import discord
 import json
+from extracommands import core
 from emoji import UNICODE_EMOJI
 
 
@@ -56,7 +57,7 @@ class Reaction(commands.Cog):
         except discord.Forbidden:
             pass
 
-    @commands.command(name='reactionrole')
+    @core.command(name='reactionrole')
     async def reaction_role(self, ctx, message: discord.Message, *selects):
         """指定したメッセージにリアクションをつけたときにどの役職を付与する・消した時に剥奪するか設定できます。
         messageにはメッセージへのurl、selectsには `絵文字 付与する役職名 絵文字 付与する役職名`と入力してください。"""

@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord
+from extracommands import core
 from typing import Union
 from .utils.database import Impression as DB_Impression
 import datetime
@@ -54,7 +55,7 @@ class Impression(commands.Cog):
                 timestamp=datetime.datetime.now().timestamp()
             )
 
-    @commands.group(aliases=['imp'])
+    @core.group(aliases=['imp'])
     async def impression(self, ctx, user: Union[discord.Member, discord.User] = None):
         if not user:
             user = ctx.author

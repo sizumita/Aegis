@@ -2,6 +2,7 @@ from discord.ext import commands
 import random
 import numpy as np
 import discord
+from extracommands import core
 
 
 def format_team(teams):
@@ -17,7 +18,7 @@ class Teaming(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
+    @core.group()
     async def teaming(self, ctx, team_count: int, *, team_members):
         """チーム分け用コマンドです。サブコマンド無しだと指定した数のチームにメンションで指定したユーザーをランダムに振り分けます。"""
         members = ctx.message.mentions
@@ -31,7 +32,7 @@ class Teaming(commands.Cog):
 
         await ctx.send(embed=format_team(teams))
 
-    @teaming.command()
+    @core.command()
     async def voice(self, ctx, team_count: int):
         """コマンドを打ったユーザーが入っているボイスチャンネルにいるbot以外のユーザーを指定した数のチームに分けます。"""
         if not ctx.author.voice:

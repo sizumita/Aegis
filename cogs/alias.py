@@ -1,4 +1,5 @@
 from discord.ext import commands
+from extracommands import core
 import discord
 from .utils.database import Alias as _Alias
 
@@ -9,7 +10,7 @@ class Alias(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(invoke_without_command=True)
+    @core.group(invoke_without_command=True)
     async def alias(self, ctx):
         """エイリアスの一覧を表示・作成・削除します。"""
 

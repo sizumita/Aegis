@@ -5,6 +5,7 @@ from .utils.context import FakeContext
 from .utils.database import is_exist, create, get, add_role, add_user, delete, \
     CommandPermission, delete_role, delete_user
 from bot import Aegis
+from extracommands import core
 from typing import Union
 import discord
 from pathlib import Path, PurePath
@@ -32,7 +33,7 @@ class Manage(Cog):
 
         return command
 
-    @commands.command()
+    @core.command()
     async def usage(self, ctx, *command):
         """コマンド名を指定するとコマンドの使い方を表示します。サブコマンドは必要ありません。"""
         p = Path.cwd()/'cogs'/'utils'/'usages'/f'{command[0]}.md'
@@ -54,7 +55,7 @@ class Manage(Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.group(aliases=['cmd'], invoke_without_command=True)
+    @core.group(aliases=['cmd'], invoke_without_command=True)
     @commands.guild_only()
     async def command(self, ctx: Context, *, command_name):
         """コマンドの有効化・無効化、表示用のコマンドです。
@@ -82,7 +83,7 @@ class Manage(Cog):
 
         await ctx.send(embed=embed)
 
-    @command.group(aliases=['allow'], invoke_without_command=True)
+    @core.group(aliases=['allow'], invoke_without_command=True)
     @admin_only()
     async def enable(self, ctx: Context, *, command_name):
         """コマンドを有効化します。大文字から始めるとCogの名前とみなされ、そのCogのコマンドが全て有効化されます。（例: `cmd allow Math`）"""
@@ -136,7 +137,7 @@ class Manage(Cog):
 
         await ctx.send('有効化されていないコマンドを全て有効化しました。')
 
-    @command.group(aliases=['deny'], invoke_without_command=True)
+    @core.group(aliases=['deny'], invoke_without_command=True)
     @admin_only()
     async def disable(self, ctx: Context, *, command_name):
         """コマンドを無効化します。設定した権限は初期化されます。
@@ -194,7 +195,7 @@ class Manage(Cog):
 
         await ctx.send('有効化されているコマンドを全て無効化しました。')
 
-    @commands.group()
+    @core.group()
     @commands.guild_only()
     @admin_only()
     async def permit(self, ctx):

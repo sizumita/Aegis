@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord
+from extracommands import core
 
 
 class Fun(commands.Cog):
@@ -8,32 +9,32 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @core.command()
     async def ping(self, ctx):
         await ctx.send('pong!')
 
-    @commands.command()
+    @core.command()
     async def cat(self, ctx):
         """猫の画像を表示します。"""
         json = await self.bot.get_json('https://aws.random.cat/meow')
         url = json['file'].replace('\\', '')
         await ctx.send(url)
 
-    @commands.command()
+    @core.command()
     async def dog(self, ctx):
         """犬の画像を表示します。"""
         json = await self.bot.get_json('https://dog.ceo/api/breeds/image/random')
         url = json['message'].replace('\\', '')
         await ctx.send(url)
 
-    @commands.command()
+    @core.command()
     async def fox(self, ctx):
         """狐の画像を表示します。"""
         json = await self.bot.get_json('https://randomfox.ca/floof/')
         url = json['image'].replace('\\', '')
         await ctx.send(url)
 
-    @commands.command('yesno')
+    @core.command('yesno')
     @commands.cooldown(2, 20)
     async def yes_no(self, ctx):
         """
