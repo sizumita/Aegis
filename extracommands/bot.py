@@ -3,6 +3,7 @@ from discord.ext.commands.bot import StringView
 import discord
 from .context import ExtraContext, ContextGroup
 from .core import command
+import copy
 
 
 class Bot(commands.Bot):
@@ -109,24 +110,34 @@ class Bot(commands.Bot):
             _message = message
             _message.content = invoked_prefix + content.lstrip(' ')
 
-            view = StringView(invoked_prefix + content.lstrip(' '))
-            ctx = cls(prefix=None, view=view, bot=self, message=_message)
+            ctx = self.get_ctx(_message, invoked_prefix, cls=cls)
 
-            ctx.prefix = invoked_prefix
-            view.skip_string(invoked_prefix)
-
-            invoker = view.get_word()
-            ctx.invoked_with = invoker
-            ctx.command = self.all_commands.get(invoker)
+            try:
+                await ctx.command._parse_arguments(ctx)
+            except Exception:
+                ctx = self.get_ctx(_message, invoked_prefix, cls=cls)
+            else:
+                ctx = self.get_ctx(_message, invoked_prefix, cls=cls)
+                contexts[-1].be_piped = False
 
             if command_contents:
                 ctx.be_piped = True
 
-            if not getattr(ctx.command, 'receive_pipe', True) and contexts:
-                contexts[-1].be_piped = False
-
             contexts.append(ctx)
 
         return contexts
+
+    def get_ctx(self, message, invoked_prefix, *, cls=ExtraContext):
+        view = StringView(message.content)
+        ctx = cls(prefix=None, view=view, bot=self, message=message)
+        ctx.prefix = invoked_prefix
+        view.skip_string(invoked_prefix)
+
+        invoker = view.get_word()
+        ctx.invoked_with = invoker
+        ctx.command = self.all_commands.get(invoker)
+
+        return ctx
+
 
 

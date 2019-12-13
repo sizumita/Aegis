@@ -12,18 +12,21 @@ class Utils(commands.Cog):
 
     @command()
     async def reverse(self, ctx, *, text):
+        """与えられたテキストを反転します。"""
         await ctx.send(clean_mention(text[::-1]))
 
     @command()
     async def echo(self, ctx, *, text):
+        """与えられたテキストをメンションを無効化して表示します。"""
         await ctx.send(clean_mention(text))
 
     @command()
     async def grep(self, ctx, keyword, *, text):
         pass
 
-    @command(receive_pipe=False)
+    @command()
     async def wait(self, ctx, wait_time: int):
+        """指定した秒数動作を停止します。"""
         await asyncio.sleep(wait_time)
 
 

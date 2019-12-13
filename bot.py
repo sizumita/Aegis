@@ -104,7 +104,7 @@ class Aegis(Bot):
                 context.passed_pipe_content = '\n'.join(invoked_context.pipe_contents)
             await self.invoke(context)
             invoked_context = context
-            await self.set_command_history(context)
+            await self.set_command_history(invoked_context)
 
     async def on_message(self, message):
         if message.author.bot:

@@ -4,10 +4,6 @@ from discord.ext.commands import converter as converters
 
 
 class ExtraCommand(commands.Command):
-    def __init__(self, func, **kwargs):
-        super().__init__(func, **kwargs)
-        self.receive_pipe = kwargs.pop('receive_pipe', True)
-
     async def transform(self, ctx, param):
         required = param.default is param.empty
         converter = self._get_converter(param)
