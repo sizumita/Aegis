@@ -83,7 +83,7 @@ class Manage(Cog):
 
         await ctx.send(embed=embed)
 
-    @core.group(aliases=['allow'], invoke_without_command=True)
+    @command.group(aliases=['allow'], invoke_without_command=True)
     @admin_only()
     async def enable(self, ctx: Context, *, command_name):
         """コマンドを有効化します。大文字から始めるとCogの名前とみなされ、そのCogのコマンドが全て有効化されます。（例: `cmd allow Math`）"""
@@ -137,7 +137,7 @@ class Manage(Cog):
 
         await ctx.send('有効化されていないコマンドを全て有効化しました。')
 
-    @core.group(aliases=['deny'], invoke_without_command=True)
+    @command.group(aliases=['deny'], invoke_without_command=True)
     @admin_only()
     async def disable(self, ctx: Context, *, command_name):
         """コマンドを無効化します。設定した権限は初期化されます。
