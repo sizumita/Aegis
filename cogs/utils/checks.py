@@ -87,3 +87,12 @@ def safety():
         return True
 
     return check(predicate)
+
+
+def prefix_in(prefixes):
+    async def predicate(ctx):
+        if ctx.prefix not in prefixes:
+            return False
+        return True
+
+    return check(predicate)
