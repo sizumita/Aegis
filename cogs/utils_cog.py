@@ -60,7 +60,7 @@ class Utils(commands.Cog):
         if not member:
             member = ctx.author
 
-        await member.joined_at
+        await ctx.send(member.joined_at)
 
     @command()
     async def timer(self, ctx):
