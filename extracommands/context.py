@@ -4,13 +4,13 @@ from discord.ext import commands
 class ExtraContext(commands.Context):
     def __init__(self, **attrs):
         super().__init__(**attrs)
-        self.be_piped = attrs.pop('be_piped', False)
+        self.be_pipe = attrs.pop('be_pipe', False)
         self.passed_pipe_content = attrs.pop('passed_pipe_content', None)
         self.pipe_contents = []
-        self.view_content = ''
+        self.pipe_data = {}
 
     async def send(self, content=None, *, tts=False, embed=None, file=None, files=None, delete_after=None, nonce=None):
-        if self.be_piped:
+        if self.be_pipe:
             if content:
                 self.pipe_contents.append(str(content))
                 return

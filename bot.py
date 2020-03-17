@@ -82,7 +82,7 @@ class Aegis(Bot):
         await CommandHistory.create(user_id=context.author.id,
                                     command=self.get_command_full_name(context.command),
                                     channel_id=context.channel.id,
-                                    guild_id=0 if context.guild else context.guild.id,
+                                    guild_id=0 if not context.guild else context.guild.id,
                                     timestamp=context.message.created_at.timestamp(),
                                     )
         channel = self.get_channel(583290964043366411)
@@ -100,8 +100,10 @@ class Aegis(Bot):
     async def invoke_group(self, group):
         invoked_context = None
         for context in group.contexts:
-            if invoked_context and invoked_context.pipe_contents:
-                context.passed_pipe_content = '\n'.join(invoked_context.pipe_contents)
+            if invoked_context:
+                if invoked_context.pipe_contents:
+                    context.passed_pipe_content = '\n'.join(invoked_context.pipe_contents)
+                context.pipe_data = invoked_context.pipe_data
             await self.invoke(context)
             invoked_context = context
             await self.set_command_history(invoked_context)
@@ -151,3 +153,4 @@ class Aegis(Bot):
         buffer = io.BytesIO(await r.read())
         buffer.seek(0)
         return discord.File(fp=buffer, filename='image.png')
+
