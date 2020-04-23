@@ -66,5 +66,6 @@ class Impression(commands.Cog):
 
 
 def setup(bot):
-    return bot.add_cog(Impression(bot))
+    # removed
+    pass
 

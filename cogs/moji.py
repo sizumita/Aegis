@@ -3,6 +3,7 @@ import discord
 import re
 from extracommands import core
 from .utils.generating import draw_lines, draw_string
+from cogs.utils.vibration import vibration
 
 
 change_types = {
@@ -88,6 +89,19 @@ class Moji(commands.Cog):
             buffer = await draw_string(ctx, text, **payload)
 
         await ctx.send(file=discord.File(buffer, filename='image.png'))
+
+    @core.command()
+    async def vibration(self, ctx):
+        """メッセージに添付された画像を震わせたgifにします。"""
+        if not ctx.message.attachments:
+            await ctx.send("写真が添付されていません。")
+            return
+        if not ctx.message.attachments[0].url.endswith(('png', 'jpg', 'jpeg', 'PNG', 'JPEG', 'JPG')):
+            await ctx.send("そのファイルはサポートされていません。png, jpegを使用してください。")
+            return
+        image_bytes = await ctx.message.attachments[0].read()
+        buffer = vibration(image_bytes)
+        await ctx.send(file=discord.File(buffer, filename='image.gif'))
 
 
 def setup(bot):
