@@ -19,9 +19,8 @@ def _prefix_callable(bot, msg):
     if msg.guild is None:
         base.append('.')
         base.append(':')
-        base.append('お前、')
     else:
-        base.extend(bot.prefixes.get(msg.guild.id, ['.', ':', 'お前、']))
+        base.extend(bot.prefixes.get(msg.guild.id, ['.', ':']))
     return base
 
 
@@ -41,16 +40,17 @@ class Aegis(Bot):
 
     async def rolling_presence(self):
         await self.wait_until_ready()
-        presences = ['Aegis - A discord Bot', 'help -> .help']
-        i = 0
-        while not self.is_closed():
-            await self.change_presence(activity=discord.Game(name=presences[i]))
-            await asyncio.sleep(5)
-
-            if i == len(presences) - 1:
-                i = 0
-            else:
-                i += 1
+        # presences = ['Aegis - A discord Bot', 'help -> .help']
+        await self.change_presence(activity=discord.Game(name='help -> .help'))
+        # i = 0
+        # while not self.is_closed():
+        #     await self.change_presence(activity=discord.Game(name=presences[i]))
+        #     await asyncio.sleep(5)
+        #
+        #     if i == len(presences) - 1:
+        #         i = 0
+        #     else:
+        #         i += 1
 
     async def on_command_error(self, context, exception):
         if isinstance(exception, commands.MissingRequiredArgument):
@@ -92,7 +92,7 @@ class Aegis(Bot):
         if context.guild:
             embed.add_field(name='チャンネル', value=f'カテゴリー: {context.channel.category}: {context.channel.name}')
         embed.add_field(name='コマンド内容', value=f'`{context.message.content}`')
-        embed.add_field(name='リンク', value=f'{context.channel.mention} [メッセージリンク]({discord.Message.jump_url})')
+        embed.add_field(name='リンク', value=f'{context.channel.mention} (メッセージリンク)[{discord.Message.jump_url}]')
         try:
             await channel.send(embed=embed)
         except AttributeError:
