@@ -19,8 +19,9 @@ def _prefix_callable(bot, msg):
     if msg.guild is None:
         base.append('.')
         base.append(':')
+        base.append('お前、')
     else:
-        base.extend(bot.prefixes.get(msg.guild.id, ['.', ':']))
+        base.extend(bot.prefixes.get(msg.guild.id, ['.', ':', 'お前、']))
     return base
 
 
