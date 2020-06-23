@@ -12,6 +12,10 @@ import sys
 import asyncio
 from extracommands import Bot
 
+banned_user_list = [
+    650349871152496661,
+]
+
 
 def _prefix_callable(bot, msg):
     user_id = bot.user.id
@@ -111,6 +115,9 @@ class Aegis(Bot):
 
     async def on_message(self, message):
         if message.author.bot:
+            return
+        
+        if message.author.id in banned_user_list:
             return
 
         message = await self.check_alias(message)

@@ -98,6 +98,8 @@ async def get_unique_emoji(emoji: discord.Emoji, h: int):
 
 async def get_text(text, font='./cogs/utils/otf/CP Font.otf', size=100,
                    border="#23272A", border_width=1.2, color='#7289DA', background="",):
+    if size >= 2000:
+        size = 2000
     image = Image.new("RGBA", (len(text) * size, int(size * 1.25)), background or (0, 0, 0, 0))
     image, draw = get_draw(image, font, size)
 
