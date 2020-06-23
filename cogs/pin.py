@@ -3,7 +3,7 @@ import discord
 from extracommands import core
 
 
-class Fun(commands.Cog):
+class Pin(commands.Cog):
     already_on = False
 
     def __init__(self, bot):
@@ -16,4 +16,4 @@ class Fun(commands.Cog):
 
 
 def setup(bot):
-    return bot.add_cog(Fun(bot))
+    return bot.add_cog(Pin(bot))
